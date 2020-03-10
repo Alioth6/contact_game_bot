@@ -1,2 +1,2 @@
-# Contact_game-bot
-CSC NLP project - Contact game-bot
+# contact_game_bot
+CSC NLP project - contact game bot

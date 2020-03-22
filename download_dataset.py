@@ -63,11 +63,11 @@ def download_files(files, target_dir, url):
 
 
 def parse_dumped_file(input_file, output_file, is_wikipedia):
-    handler = wiki_xml_handler.WikiXmlHandler()
+    handler = WikiXmlHandler()
     xml_parser = xml.sax.make_parser()
     xml_parser.setContentHandler(handler)
-    writer = data_writer.DataWriter(output_file)
-    wiki_parser = wiki_code_parser.WikiCodeParser(is_wikipedia)
+    writer = DataWriter(output_file)
+    wiki_parser = WikiCodeParser(is_wikipedia)
     # bzcat = console utility, read .bz compressed file line by line
     count = 0
     for i, line in enumerate(subprocess.Popen(['bzcat'],

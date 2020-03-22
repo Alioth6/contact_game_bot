@@ -1,19 +1,11 @@
-import random
 import telebot
-import settings
 from telebot import apihelper
+
+import settings
+from .utils import get_random_word, convert_question_to_word
 
 
 bot = telebot.TeleBot(settings.TELEGRAM_API_TOKEN)
-
-
-def get_random_word():
-    list_words = ['cat','dog', 'brother']
-    return random.choice(list_words)
-
-
-def convert_question_to_word(question):
-    return question.split()[0]
 
 
 @bot.message_handler(commands=['start'])
@@ -25,12 +17,13 @@ def start_message(message):
 
 @bot.message_handler(content_types=['text'])
 def user_enter(message, word, index):
-    if convert_question_to_word(message.text) == word:
+    answer = convert_question_to_word(message.text)
+    if answer == word:
         msg = bot.send_message(message.chat.id, 'Congratulations, you guessed the word {}. Run game /start'.format(word))
         return
-    elif convert_question_to_word(message.text)[:index] == word[:index]:
+    elif answer[:index] == word[:index]:
         msg = bot.send_message(message.chat.id,'Next char: {}'.format(word[index]))
-        index+=1
+        index += 1
     else:
         msg = bot.send_message(message.chat.id, 'Try again')
 

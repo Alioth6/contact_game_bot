@@ -16,9 +16,10 @@ import multiprocessing as mp
 from bs4 import BeautifulSoup
 from keras.utils import get_file
 
-import wiki_xml_handler
-import wiki_code_parser
-import data_writer
+from src.data_preprocessing.wiki_xml_handler import WikiXmlHandler
+from src.data_preprocessing.wiki_code_parser import WikiCodeParser
+from src.data_preprocessing.data_writer import DataWriter
+from src.utils import validate_file
 
 # List of lists to single list
 from itertools import chain
@@ -26,23 +27,9 @@ from itertools import chain
 # Sending keyword arguments in map
 from functools import partial
 
-multistream_reg = re.compile('multistream')
-pages_full_reg = re.compile('pages-articles')
-pages_reg = re.compile('pages-articles[1-9]')
-
 
 def bytes_to_unicode(bytes):
     return bytes.decode('utf8').replace(u'\xa0', u' ')
-
-
-def validate_file(filename, is_full):
-    """We should only download files with pages-articles substing in name"""
-    multistream = multistream_reg.findall(filename)
-    article_pattern = pages_full_reg if is_full else pages_reg
-    article = article_pattern.findall(filename)
-    if not multistream and article:
-        return True
-    return False
 
 
 def get_file_urls(base_url, version, download_full=False):

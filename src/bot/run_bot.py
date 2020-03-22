@@ -2,7 +2,7 @@ import telebot
 from telebot import apihelper
 
 import settings
-from .utils import get_random_word, convert_question_to_word
+from utils import get_random_word, convert_question_to_word
 
 
 bot = telebot.TeleBot(settings.TELEGRAM_API_TOKEN)

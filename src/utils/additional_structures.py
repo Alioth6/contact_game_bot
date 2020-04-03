@@ -92,5 +92,7 @@ class Text2Lemms:
         list_lemm = []
         for lemma in self.mystem.analyze(text):
             if 'analysis' in lemma and len(lemma['analysis']):
-                list_lemm.append(lemma['analysis'][0]['lex'])
+                analysis = lemma['analysis'][0]
+                if analysis.get('qual', None) != 'bastard':
+                    list_lemm.append(analysis['lex'])
         return list_lemm

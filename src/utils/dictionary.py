@@ -22,7 +22,6 @@ def get_wiki_words():
     text_id = df.keys()[2]
     list_defs = df[text_id]
     set_words = []
-    
 
     for text in list_defs:
         set_words += Text2LemmsModel.get_lemms(text)

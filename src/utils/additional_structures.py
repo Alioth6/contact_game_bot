@@ -1,14 +1,18 @@
+import compress_fasttext
+from pymystem3 import Mystem
+
+
 class Word2vec:
     def get_word_vector(self, word):
         raise Exception('Not implemented')
 
 
 class FastText(Word2vec):
+    def __init__(self, path):
+        self.model = compress_fasttext.models.CompressedFastTextKeyedVectors.load(path)
+    
     def get_word_vector(self, word):
-        vector = [ 0 for i in range(300)]
-        for i, ch in enumerate(word):
-            vector[i] = ord(ch)
-        return vector        
+        return self.model[word]      
 
 
 class _Node:
@@ -32,7 +36,7 @@ class _Node:
 
         while stack:
             tmp_node, prefix = stack.pop(0)
-            if tmp_node.value:
+            if tmp_node.value is not None:
                 yield prefix, tmp_node.value
             
             for char, child in tmp_node.children.items():
@@ -40,6 +44,14 @@ class _Node:
 
 
 class WordTrie:
+    '''
+        How use 
+
+        wt = WordTrie(FastText())
+        wt.build_dict(['word', 'world', 'cat', 'cats'])
+        for word, vector in wt.search_by_prefix('cats'): 
+            print(word)
+    '''
     def __init__(self, word2vec:Word2vec):
         self.root = _Node('*')
         self.get_vector = word2vec.get_word_vector
@@ -72,7 +84,13 @@ class WordTrie:
         yield from tmp_node.get_childs()
 
 
-# wt = WordTrie(FastText())
-# wt.build_dict(['word', 'world', 'cat', 'cats'])
-# for word, vector in wt.search_by_prefix('cats'): 
-#     print(word)
+class Text2Lemms:
+    def __init__(self):
+        self.mystem = Mystem()
+    
+    def get_lemms(self, text):
+        list_lemm = []
+        for lemma in self.mystem.analyze(text):
+            if 'analysis' in lemma and len(lemma['analysis']):
+                list_lemm.append(lemma['analysis'][0]['lex'])
+        return list_lemm

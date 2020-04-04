@@ -1,0 +1,3 @@
+[submodule "src/data_preprocessing/russian-words"]
+	path = src/data_preprocessing/russian-words
+	url = git://github.com/danakt/russian-words.git

@@ -24,7 +24,7 @@ def get_wiki_words():
     set_words = []
 
     for text in list_defs:
-        set_words += text2LemmsModel.get_lemms(text)
+        set_words += text2LemmsModel.get_lemms(text, 'S')
 
     return Counter(set_words)
 

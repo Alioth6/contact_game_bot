@@ -40,7 +40,7 @@ class TopRangeWords(Naive_metric):
 
         top_w = get_top_words_with_prefix(word, prefix)
         top_w = [ k for k, v in sorted(top_w.items(), 
-                    key=lambda item: -item[1])][:self.num_top + 1] #учет искомого слова
+                    key=lambda item: -item[1])][:self.num_top]
         for i, w in enumerate(top_w):
             if w in ordered_words:
                 self.n_success += 1-i*self.eps

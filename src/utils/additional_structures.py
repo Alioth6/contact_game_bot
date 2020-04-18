@@ -1,5 +1,6 @@
 import compress_fasttext
 from pymystem3 import Mystem
+import re
 
 
 class Word2vec:
@@ -26,7 +27,7 @@ class Text2Lemms:
                 analysis = lemma['analysis'][0]
                 if analysis.get('qual', None) == 'bastard':
                     continue
-                pos_tag = analysis['gr'].split(',')[0]
+                pos_tag = re.match('[A-Z]+', analysis['gr']).group(0)
                 if tag and pos_tag==tag:
                     list_lemm.append(analysis['lex'])
                 elif not tag:

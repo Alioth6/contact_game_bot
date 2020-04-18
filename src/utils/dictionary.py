@@ -10,7 +10,7 @@ DATA_PATH = os.path.join(PROJECT_DIR, '../data')
 
 PATH_TO_WIGHT_FASTTEXT = os.path.join(DATA_PATH, 'ft_freqprune_400K_100K_pq_300.bin')
 PATH_TO_WIKI = os.path.join(DATA_PATH, 'wiktionary_data0.csv')
-DICTIONARY_SIZE = 100000
+DICTIONARY_SIZE = 10000
 
 BAD_WORDS = stopwords.words("russian")
 text2LemmsModel = Text2Lemms()
@@ -32,7 +32,6 @@ def get_wiki_words():
 def get_prefix_trie():
     stopwords.words("russian")
     words = get_wiki_words()
-
 
     for w in BAD_WORDS:
         words.pop(w, 0)

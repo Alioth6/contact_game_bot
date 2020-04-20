@@ -1,5 +1,6 @@
 import compress_fasttext
 from pymystem3 import Mystem
+import re
 
 
 class Word2vec:
@@ -15,32 +16,23 @@ class FastText(Word2vec):
         return self.model[word]      
 
 
-class _Node:
-    def __init__(self, char: str):
-        self.char = char
-        self.children = {}
-        self.value = None
-        self.parent = None
-
-    def _get_prefix(self):
-        tmp_node = self
-        prefix = ''
-        while tmp_node.parent:
-            prefix = tmp_node.char + prefix
-            tmp_node = tmp_node.parent
-
-        return prefix
-
-    def get_childs(self):
-        stack = [(self, self._get_prefix())]
-
-        while stack:
-            tmp_node, prefix = stack.pop(0)
-            if tmp_node.value is not None:
-                yield prefix, tmp_node.value
-            
-            for char, child in tmp_node.children.items():
-                stack.append((child, prefix+char))
+class Text2Lemms:
+    def __init__(self):
+        self.mystem = Mystem()
+    
+    def get_lemms(self, text, tag=None):
+        list_lemm = []
+        for lemma in self.mystem.analyze(text):
+            if 'analysis' in lemma and len(lemma['analysis']):
+                analysis = lemma['analysis'][0]
+                if analysis.get('qual', None) == 'bastard':
+                    continue
+                pos_tag = re.match('[A-Z]+', analysis['gr']).group(0)
+                if tag and pos_tag==tag:
+                    list_lemm.append(analysis['lex'])
+                elif not tag:
+                    list_lemm.append({'lex': analysis['lex'], 'pos': pos_tag})
+        return list_lemm
 
 
 class WordTrie:
@@ -84,15 +76,34 @@ class WordTrie:
         yield from tmp_node.get_childs()
 
 
-class Text2Lemms:
-    def __init__(self):
-        self.mystem = Mystem()
-    
-    def get_lemms(self, text):
-        list_lemm = []
-        for lemma in self.mystem.analyze(text):
-            if 'analysis' in lemma and len(lemma['analysis']):
-                analysis = lemma['analysis'][0]
-                if analysis.get('qual', None) != 'bastard':
-                    list_lemm.append(analysis['lex'])
-        return list_lemm
+#####################
+##### for WordTrie
+#####################
+
+
+class _Node:
+    def __init__(self, char: str):
+        self.char = char
+        self.children = {}
+        self.value = None
+        self.parent = None
+
+    def _get_prefix(self):
+        tmp_node = self
+        prefix = ''
+        while tmp_node.parent:
+            prefix = tmp_node.char + prefix
+            tmp_node = tmp_node.parent
+
+        return prefix
+
+    def get_childs(self):
+        stack = [(self, self._get_prefix())]
+
+        while stack:
+            tmp_node, prefix = stack.pop(0)
+            if tmp_node.value is not None:
+                yield prefix, tmp_node.value
+            
+            for char, child in tmp_node.children.items():
+                stack.append((child, prefix+char))

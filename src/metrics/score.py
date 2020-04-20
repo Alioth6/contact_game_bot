@@ -5,7 +5,7 @@ from src.utils.dictionary import get_prefix_trie
 DISTANSE_MIN = 0.55
 
 
-class Naive_metric():
+class NaiveMetric():
     def __init__(self):
         self.n_success = 0
         self.n_test = 0
@@ -19,7 +19,7 @@ class Naive_metric():
         return self.n_success / self.n_test
 
 
-class TopWords(Naive_metric):
+class TopWords(NaiveMetric):
     def __init__(self, prefix_trie=None):
         super().__init__()
         self.prefix_trie = prefix_trie if prefix_trie else get_prefix_trie()

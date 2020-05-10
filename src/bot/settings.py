@@ -3,7 +3,7 @@ from src.models.hyp_model import HypWords
 from src.models.sim_model import SimWords
 
 
-TELEGRAM_API_TOKEN = '1079775223:AAHzut5iNPZZIzPLbIOFL0NaVXnleTdTy0A'
+TELEGRAM_API_TOKEN = 'token'
 
 USER_STATE = 'data/user_state'  # Файл с хранилищем
 DATABASE_NAME = 'data/definition.db'  # Файл с базой данных

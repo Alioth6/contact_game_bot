@@ -15,7 +15,7 @@ test_model('rus_test_set.csv', sim_model, NaiveMetric())
 '''
 
 
-def test_model(test_set_name, model, metric):
+def test_model(test_set_name, model, metric, prefix_size = 1):
     '''
     example:
 
@@ -32,7 +32,6 @@ def test_model(test_set_name, model, metric):
         word = test_set.iloc[i]['word']
         if model.is_in_vocab(word):
             def_text = test_set.iloc[i]['defs']
-            prefix_size = 0
 
             res = model.get_words(def_text, word[:prefix_size])
             metric.update(word, res)

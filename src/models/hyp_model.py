@@ -18,7 +18,8 @@ class HypWords:
         return []
 
     def is_in_vocab(self, word):
-        return True
+        sets = self.wikiwordnet.get_synsets(word)
+        return len(sets) != 0
 
     def get_words(self, sentence, prefix):
         list_lex = text2LemmsModel.get_lemms(sentence)

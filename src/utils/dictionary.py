@@ -17,21 +17,24 @@ text2LemmsModel = Text2Lemms()
 fastTextModel = FastText(PATH_TO_WIGHT_FASTTEXT)
 
 
-def get_wiki_words():
+def get_wiki_words(is_all_words_list=None):
     df = pd.read_csv(PATH_TO_WIKI, delimiter='\\')
     text_id = df.keys()[2]
     list_defs = df[text_id]
     set_words = []
 
     for text in list_defs:
-        set_words += text2LemmsModel.get_lemms(text, 'S')
+        if is_all_words_list is None:
+            set_words += text2LemmsModel.get_lemms(text, 'S')
+        else:
+            set_words += text2LemmsModel.get_lemms(text)
 
     return Counter(set_words)
 
 
-def get_prefix_trie():
+def get_prefix_trie(is_all_words_list=None):
     stopwords.words("russian")
-    words = get_wiki_words()
+    words = get_wiki_words(is_all_words_list)
 
     for w in BAD_WORDS:
         words.pop(w, 0)

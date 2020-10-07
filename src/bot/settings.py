@@ -1,9 +1,13 @@
+import urllib.request
+import os.path
 from enum import Enum
 from src.models.hyp_model import HypWords
 from src.models.sim_model import SimWords
+from src.models.sum_model import SumWords
+from gensim.models import KeyedVectors
+from gensim.models.word2vec import Word2Vec
 
-
-TELEGRAM_API_TOKEN = 'token'
+TELEGRAM_API_TOKEN = '1079775223:AAHzut5iNPZZIzPLbIOFL0NaVXnleTdTy0A'
 
 USER_STATE = 'data/user_state'  # Файл с хранилищем
 DATABASE_NAME = 'data/definition.db'  # Файл с базой данных
@@ -16,10 +20,25 @@ class States(Enum):
 
 
 def init_models():
-    # SimWords(, a_tops=1) - хз как загружать
-    hypWords = HypWords()
+    url = 'http://panchenko.me/data/dsl-backup/w2v-ru/all.norm-sz100-w10-cb0-it1-min100.w2v'
+    rdt_name = 'data/RDT_light.w2v'
+    if not os.path.isfile(rdt_name):
+        print('Beginning w2v file download...')
+        urllib.request.urlretrieve(url, rdt_name)
+
+    print('Loading W2v...')
+    mod_rdt = KeyedVectors.load_word2vec_format(rdt_name, binary=True, unicode_errors='ignore')
+
+    print('Models initialization...')
+
+    # hypWords = HypWords()
+    sum_words = SumWords(mod_rdt, 20)
+
+    print('Ready')
+
     return [
-        hypWords
+        # hypWords,
+        sum_words
     ]
 
 

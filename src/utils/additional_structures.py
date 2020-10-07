@@ -47,8 +47,10 @@ class WordTrie:
     def __init__(self, word2vec:Word2vec):
         self.root = _Node('*')
         self.get_vector = word2vec.get_word_vector
+        self.all_words = []
 
     def add(self, word):
+        self.all_words.append(word)
         tmp_node = self.root
 
         for char in word:

@@ -3,7 +3,7 @@ from telebot import types
 
 import src.bot.settings as config
 from src.bot import utils
-
+from src.bot.utils import add_definition
 
 bot = telebot.TeleBot(config.TELEGRAM_API_TOKEN)
 empty_keyboard_hider = types.ReplyKeyboardRemove()
@@ -101,6 +101,8 @@ def check_word(message, user_data):
     word = user_data['word']
     gold = user_data['gold']
     index = user_data['index']
+
+    add_definition(user_data['definition'], word)
 
     if gold == word:
         msg = bot.send_message(

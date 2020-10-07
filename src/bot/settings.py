@@ -10,7 +10,7 @@ from gensim.models.word2vec import Word2Vec
 TELEGRAM_API_TOKEN = '1079775223:AAHzut5iNPZZIzPLbIOFL0NaVXnleTdTy0A'
 
 USER_STATE = 'data/user_state'  # Файл с хранилищем
-DATABASE_NAME = 'data/definition.db'  # Файл с базой данных
+DATABASE_NAME = 'data/database.csv'  # Файл с базой данных
 
 
 class States(Enum):

@@ -22,4 +22,18 @@ def init_models():
         hypWords
     ]
 
+
+def init_puzzle_nouns():
+    nouns_list_name = 'data/freq_nouns.txt'
+
+    puzzle_nouns = []
+
+    with open(nouns_list_name) as f:
+        for i in f:
+            puzzle_nouns.append(i[:-1])
+
+    return puzzle_nouns
+
+
 LIST_MODELS = init_models()
+LIST_PUZZLE_NOUNS = init_puzzle_nouns()

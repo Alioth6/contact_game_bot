@@ -52,8 +52,7 @@ def get_user_state(chat_id):
 
 
 def get_random_word():
-    list_words = ['кошка', 'собака']
-    return random.choice(list_words)
+    return random.choice(conf.LIST_PUZZLE_NOUNS)
 
 
 def convert_question_to_word(question, prefix=None):

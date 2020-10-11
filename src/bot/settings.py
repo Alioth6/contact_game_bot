@@ -19,6 +19,12 @@ class States(Enum):
     S_CHECK_WORD = 2
 
 
+def init_no_models():
+    print('Ready')
+
+    return []
+
+
 def init_models():
     url = 'http://panchenko.me/data/dsl-backup/w2v-ru/all.norm-sz100-w10-cb0-it1-min100.w2v'
     rdt_name = 'data/RDT_light.w2v'
@@ -54,5 +60,5 @@ def init_puzzle_nouns():
     return puzzle_nouns
 
 
-LIST_MODELS = init_models()
+LIST_MODELS = init_no_models()
 LIST_PUZZLE_NOUNS = init_puzzle_nouns()

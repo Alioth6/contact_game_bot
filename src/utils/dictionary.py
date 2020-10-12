@@ -23,11 +23,9 @@ def get_wiki_words(is_all_words_list=None):
     list_defs = df[text_id]
     set_words = []
 
+    tag = 'S' if is_all_words_list is None else None
     for text in list_defs:
-        if is_all_words_list is None:
-            set_words += text2LemmsModel.get_lemms(text, 'S')
-        else:
-            set_words += text2LemmsModel.get_lemms(text)
+        set_words += text2LemmsModel.get_lemms(text, tag)
 
     return Counter(set_words)
 

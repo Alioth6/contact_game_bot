@@ -29,8 +29,8 @@ def init_no_models():
 def init_models():
     print('Models initialization...')
 
-    fasttext_mod_url = 'https://github.com/avidale/compress-fasttext/releases/download/v0.0.1/ft_freqprune_400K_100K_pq_300.bin'
-    fasttext_mod = compress_fasttext.models.CompressedFastTextKeyedVectors.load(fasttext_mod_url)
+    fasttext_mod_path = 'data/ft_freqprune_100K_20K_pq_300.bin'
+    fasttext_mod = compress_fasttext.models.CompressedFastTextKeyedVectors.load(fasttext_mod_path)
 
     sum_words = SumWords(fasttext_mod, 20)
 

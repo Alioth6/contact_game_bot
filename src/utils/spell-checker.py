@@ -3,8 +3,8 @@ from .additional_structures import _Node, WordTrie
 
 
 class Spell_checker:
-    def __init__(self):
-        self.trie = get_prefix_trie(True)
+    def __init__(self, trie=get_prefix_trie(True)):
+        self.trie = trie
         self.min_dist = 100
         self.closest_str = ""
 

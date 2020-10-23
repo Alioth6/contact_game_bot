@@ -10,6 +10,10 @@ from gensim.models.word2vec import Word2Vec
 
 TELEGRAM_API_TOKEN = '1079775223:AAHzut5iNPZZIzPLbIOFL0NaVXnleTdTy0A'
 
+S3_BUCKET_NAME=os.environ['S3_BUCKET_NAME']
+AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+
 USER_STATE = 'data/user_state'  # Файл с хранилищем
 DATABASE_NAME = 'data/database.csv'  # Файл с базой данных
 
@@ -29,8 +33,20 @@ def init_no_models():
 def init_models():
     print('Models initialization...')
 
-    fasttext_mod_path = 'http://contact-game-model.s3.amazonaws.com/ft_freqprune_400K_100K_pq_300.bin'
-    fasttext_mod = compress_fasttext.models.CompressedFastTextKeyedVectors.load(fasttext_mod_path)
+    model_file_name = 'ft_freqprune_400K_100K_pq_300.bin'
+    fasttext_mod_url = ''.join([
+        's3://',
+        AWS_ACCESS_KEY_ID,
+        ":",
+        AWS_SECRET_ACCESS_KEY,
+        '@',
+        S3_BUCKET_NAME,
+        '/',
+        model_file_name
+    ])
+
+    # fasttext_mod = compress_fasttext.models.CompressedFastTextKeyedVectors.load(fasttext_mod_url)
+    fasttext_mod = KeyedVectors.load(fasttext_mod_url)
 
     sum_words = SumWords(fasttext_mod, 20)
 

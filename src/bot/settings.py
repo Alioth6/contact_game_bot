@@ -8,7 +8,7 @@ from src.models.sum_model import SumWords
 from gensim.models import KeyedVectors
 from gensim.models.word2vec import Word2Vec
 
-TELEGRAM_API_TOKEN = '1079775223:AAHzut5iNPZZIzPLbIOFL0NaVXnleTdTy0A'
+TELEGRAM_API_TOKEN = os.environ['TOKEN']
 
 S3_BUCKET_NAME=os.environ['S3_BUCKET_NAME']
 AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']

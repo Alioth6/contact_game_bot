@@ -17,6 +17,8 @@ AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
 USER_STATE = 'data/user_state'  # Файл с хранилищем
 DATABASE_NAME = 'data/database.csv'  # Файл с базой данных
 
+LIST_MODELS = []
+
 
 class States(Enum):
     S_ENTER_DEFINITION = 0
@@ -57,6 +59,11 @@ def init_models():
     ]
 
 
+def fill_list_models():
+    global LIST_MODELS
+    LIST_MODELS = init_models()
+
+
 def init_puzzle_nouns():
     nouns_list_name = 'data/freq_nouns.txt'
 
@@ -69,5 +76,4 @@ def init_puzzle_nouns():
     return puzzle_nouns
 
 
-LIST_MODELS = init_models()
 LIST_PUZZLE_NOUNS = init_puzzle_nouns()

@@ -35,6 +35,7 @@ def init_no_models():
 def init_models():
     print('Models initialization...')
 
+    model_file_name = 'ft_freqprune_100K_20K_pq_300.bin'
     fasttext_mod_url = ''.join([
         's3://',
         AWS_ACCESS_KEY_ID,
@@ -45,7 +46,6 @@ def init_models():
         '/',
         model_file_name
     ])
-    model_file_name = 'ft_freqprune_100K_20K_pq_300.bin'
 
     # fasttext_mod = compress_fasttext.models.CompressedFastTextKeyedVectors.load(fasttext_mod_url)
     fasttext_mod = KeyedVectors.load(fasttext_mod_url)

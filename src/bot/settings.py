@@ -47,8 +47,7 @@ def init_models():
         model_file_name
     ])
 
-    # fasttext_mod = compress_fasttext.models.CompressedFastTextKeyedVectors.load(fasttext_mod_url)
-    fasttext_mod = KeyedVectors.load(fasttext_mod_url)
+    fasttext_mod = compress_fasttext.models.CompressedFastTextKeyedVectors.load(fasttext_mod_url)
 
     sum_words = SumWords(fasttext_mod, 20)
 

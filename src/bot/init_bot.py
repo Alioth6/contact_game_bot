@@ -1,14 +1,19 @@
-import telebot
-from telebot import types
-
 from flask import Flask, request
+
+import logging
 
 import src.bot.settings as config
 from src.bot import utils
-from src.bot.utils import add_definition
+
+import telebot
+from telebot import types
+
 
 bot = telebot.TeleBot(config.TELEGRAM_API_TOKEN)
 empty_keyboard_hider = types.ReplyKeyboardRemove()
+
+logger = telebot.logger
+telebot.logger.setLevel(logging.DEBUG)
 
 server = Flask(__name__)
 

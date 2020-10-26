@@ -35,7 +35,7 @@ def init_no_models():
 def init_models():
     print('Models initialization...')
 
-    model_file_name = 'ft_freqprune_100K_20K_pq_300.bin'
+    model_file_name = 'ft_freqprune_400K_100K_pq_300.bin'
     fasttext_mod_url = ''.join([
         's3://',
         AWS_ACCESS_KEY_ID,

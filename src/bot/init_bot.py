@@ -122,7 +122,7 @@ def check_word(message, user_data):
     gold = user_data['gold']
     index = user_data['index']
 
-    add_definition(user_data['definition'], word)
+    utils.add_definition(user_data['definition'], word)
 
     if gold == word:
         msg = bot.send_message(

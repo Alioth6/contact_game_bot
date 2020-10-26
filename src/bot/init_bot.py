@@ -112,7 +112,12 @@ def getMessage():
 
 @server.route("/")
 def webhook():
-    bot.set_webhook(url='https://intense-cove-71886.herokuapp.com/' + config.TELEGRAM_API_TOKEN)
+    print('Removing previous webhook')
+    bot.remove_webhook()
+    webhook_url = 'https://intense-cove-71886.herokuapp.com/' + config.TELEGRAM_API_TOKEN
+    print('New webhook:')
+    print(webhook_url)
+    bot.set_webhook(url=webhook_url)
     return "!", 200
 
 # проверка ответа

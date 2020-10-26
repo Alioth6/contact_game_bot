@@ -13,7 +13,7 @@ bot = telebot.TeleBot(config.TELEGRAM_API_TOKEN)
 empty_keyboard_hider = types.ReplyKeyboardRemove()
 
 logger = telebot.logger
-telebot.logger.setLevel(logging.DEBUG)
+telebot.logger.setLevel(logging.INFO)
 
 server = Flask(__name__)
 
@@ -112,11 +112,8 @@ def getMessage():
 
 @server.route("/")
 def webhook():
-    print('Removing previous webhook')
     bot.remove_webhook()
     webhook_url = 'https://intense-cove-71886.herokuapp.com/' + config.TELEGRAM_API_TOKEN
-    print('New webhook:')
-    print(webhook_url)
     bot.set_webhook(url=webhook_url)
     return "!", 200
 

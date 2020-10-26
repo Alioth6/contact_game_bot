@@ -125,3 +125,6 @@ dmypy.json
 
 media/
 local.py
+
+data/
+.idea/

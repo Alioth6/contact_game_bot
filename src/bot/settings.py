@@ -1,12 +1,13 @@
 import compress_fasttext
 from enum import Enum
+import os
 # from src.models.hyp_model import HypWords
 # from src.models.sim_model import SimWords
 from src.models.sum_model import SumWords
 
 TELEGRAM_API_TOKEN = os.environ['TOKEN']
 
-S3_BUCKET_NAME=os.environ['S3_BUCKET_NAME']
+S3_BUCKET_NAME = os.environ['S3_BUCKET_NAME']
 AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
 AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
 

@@ -1,12 +1,8 @@
-import urllib.request
-import os.path
 import compress_fasttext
 from enum import Enum
 # from src.models.hyp_model import HypWords
 # from src.models.sim_model import SimWords
 from src.models.sum_model import SumWords
-from gensim.models import KeyedVectors
-from gensim.models.word2vec import Word2Vec
 
 TELEGRAM_API_TOKEN = os.environ['TOKEN']
 

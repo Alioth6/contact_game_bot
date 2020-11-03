@@ -5,6 +5,7 @@ import os
 # from src.models.sim_model import SimWords
 from src.models.sum_model import SumWords
 
+
 TELEGRAM_API_TOKEN = os.environ['TOKEN']
 
 S3_BUCKET_NAME = os.environ['S3_BUCKET_NAME']

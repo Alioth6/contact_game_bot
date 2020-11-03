@@ -4,10 +4,9 @@ import threading
 import os
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     print('Contact game bot application')
 
-    models_init_thread = threading.Thread(target=fill_list_models)
-    models_init_thread.start()
+    threading.Thread(target=fill_list_models).start()
 
     server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))

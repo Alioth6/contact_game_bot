@@ -17,6 +17,7 @@ class Config:
 
     elif env['APP_CONFIG'] == 'heroku':
         WEBHOOK_HOST = 'https://intense-cove-71886.herokuapp.com'
+        WEBHOOK_PORT = env['AWS_ACCESS_KEY_ID']
 
         DATA_PATH = ''.join([
             's3://',

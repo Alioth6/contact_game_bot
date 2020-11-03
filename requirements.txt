@@ -9,4 +9,5 @@ pymorphy2-dicts==2.4.393442.3710985
 pymystem3==0.2.0
 pyTelegramBotAPI==3.6.7
 requests==2.24.0
+smart-open==2.2.1
 wiki-ru-wordnet==1.0.3

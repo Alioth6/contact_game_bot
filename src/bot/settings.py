@@ -1,4 +1,5 @@
 import compress_fasttext
+import smart_open
 from enum import Enum
 from config import Config
 import os
@@ -27,7 +28,7 @@ def init_puzzle_nouns():
 
     puzzle_nouns = []
 
-    with open(nouns_list_name) as f:
+    with smart_open.open(nouns_list_name) as f:
         puzzle_nouns = [string.strip() for string in f]
 
     return puzzle_nouns

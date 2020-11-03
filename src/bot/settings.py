@@ -36,12 +36,6 @@ def init_puzzle_nouns():
 LIST_PUZZLE_NOUNS = init_puzzle_nouns()
 
 
-def init_no_models():
-    print('Ready')
-
-    return []
-
-
 def init_models():
     print('Models initialization...')
 
@@ -56,11 +50,7 @@ def init_models():
 
     print('Ready')
 
-    return [
+    global LIST_MODELS
+    LIST_MODELS = [
         sum_words
     ]
-
-
-def fill_list_models():
-    global LIST_MODELS
-    LIST_MODELS = init_models()

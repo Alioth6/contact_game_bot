@@ -66,8 +66,7 @@ def init_puzzle_nouns():
     puzzle_nouns = []
 
     with open(nouns_list_name) as f:
-        for i in f:
-            puzzle_nouns.append(i[:-1])
+        puzzle_nouns = [string.strip() for string in f]
 
     return puzzle_nouns
 

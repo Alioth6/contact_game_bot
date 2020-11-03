@@ -2,6 +2,7 @@ from flask import Flask, request
 
 import logging
 
+from config import Config
 import src.bot.settings as config
 from src.bot import utils
 
@@ -9,7 +10,7 @@ import telebot
 from telebot import types
 
 
-bot = telebot.TeleBot(config.TELEGRAM_API_TOKEN)
+bot = telebot.TeleBot(Config.TOKEN)
 empty_keyboard_hider = types.ReplyKeyboardRemove()
 
 logger = telebot.logger
@@ -106,7 +107,7 @@ def default(message):
     )
 
 
-@server.route('/' + config.TELEGRAM_API_TOKEN, methods=['POST'])
+@server.route('/' + Config.TOKEN, methods=['POST'])
 def getMessage():
     bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
     return "!", 200
@@ -115,7 +116,11 @@ def getMessage():
 @server.route("/")
 def webhook():
     bot.remove_webhook()
-    webhook_url = 'https://intense-cove-71886.herokuapp.com/' + config.TELEGRAM_API_TOKEN
+    webhook_url = ''.join([
+        Config.WEBHOOK_HOST,
+        '/',
+        Config.TOKEN
+    ])
     bot.set_webhook(url=webhook_url)
     return "!", 200
 

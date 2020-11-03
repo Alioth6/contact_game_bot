@@ -7,4 +7,6 @@ CSC NLP project - contact game bot
 
 Использумеые модели:
 
--сжатая версия fasttext модели от RusVectores [ft_freqprune_100K_20K_pq_300.bin](https://github.com/avidale/compress-fasttext/releases/tag/v0.0.1)
+- сжатая версия fasttext модели от RusVectores [ft_freqprune_100K_20K_pq_300.bin](https://github.com/avidale/compress-fasttext/releases/tag/v0.0.1)
+
+Инструкция по запуску - docs/Start_bot.md

@@ -1,5 +1,6 @@
 import random
 import shelve
+from csv import writer
 
 import src.bot.settings as conf
 
@@ -52,8 +53,7 @@ def get_user_state(chat_id):
 
 
 def get_random_word():
-    list_words = ['кошка', 'собака']
-    return random.choice(list_words)
+    return random.choice(conf.LIST_PUZZLE_NOUNS)
 
 
 def convert_question_to_word(question, prefix=None):
@@ -62,6 +62,13 @@ def convert_question_to_word(question, prefix=None):
         list_words += model.get_words(question, prefix)
 
     return list_words[0] if list_words else None
+
+
+def add_definition(definition, word):
+    # Open file in append mode
+    with open(conf.DATABASE_NAME, 'a+', newline='') as db:
+        csv_writer = writer(db)
+        csv_writer.writerow([definition, word])
 
 
 # for tests

@@ -1,25 +1,35 @@
-import telebot
-from telebot import types
+from flask import Flask, request
 
+import logging
+
+from config import Config
 import src.bot.settings as config
 from src.bot import utils
 
+import telebot
+from telebot import types
 
-bot = telebot.TeleBot(config.TELEGRAM_API_TOKEN)
+
+bot = telebot.TeleBot(Config.TOKEN)
 empty_keyboard_hider = types.ReplyKeyboardRemove()
+
+logger = telebot.logger
+telebot.logger.setLevel(logging.INFO)
+
+server = Flask(__name__)
 
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
     word = utils.get_random_word()
     msg = bot.send_message(
-        message.chat.id, 
-        'Я загадал слово на букву %s.' % word[0], 
+        message.chat.id,
+        'Я загадал слово на букву %s.' % word[0],
         reply_markup=empty_keyboard_hider
     )
     utils.set_user_data(message.chat.id,
     data={
-        'gold': word, 
+        'gold': word,
         'index': 1,
         'state': config.States.S_ENTER_DEFINITION.value
     })
@@ -47,7 +57,7 @@ def enter_no(message):
 
 # ввод корректного слова
 @bot.message_handler(
-    func=lambda message: utils.get_user_state(message.chat.id)==config.States.S_ENTER_WORD.value, 
+    func=lambda message: utils.get_user_state(message.chat.id)==config.States.S_ENTER_WORD.value,
     content_types=['text'])
 def enter_word(message):
     user_data = utils.get_user_data(message.chat.id)
@@ -66,7 +76,7 @@ def enter_definition(message):
     definition = message.text
     gold = user_data['gold']
     index = user_data['index']
-    
+
     word = utils.convert_question_to_word(definition, gold[:index])
     user_data.update({
         'definition': definition,
@@ -80,7 +90,7 @@ def enter_definition(message):
         user_data['state'] = config.States.S_CHECK_WORD.value
     else:
         msg = bot.send_message(
-            message.chat.id, 
+            message.chat.id,
             "Я не знаю этого слова. Введи загаданное слово."
         )
         user_data['state'] = config.States.S_ENTER_WORD.value
@@ -91,10 +101,29 @@ def enter_definition(message):
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def default(message):
     bot.send_message(
-        message.chat.id, 
+        message.chat.id,
         """Чтобы начать игру, нажмите /start ,
 чтобы получить информацию об игре, нажмите /info"""
     )
+
+
+@server.route('/' + Config.TOKEN, methods=['POST'])
+def getMessage():
+    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+    return "!", 200
+
+
+@server.route("/")
+def webhook():
+    bot.remove_webhook()
+    webhook_url = ''.join([
+        Config.WEBHOOK_HOST,
+        '/',
+        Config.TOKEN
+    ])
+    bot.set_webhook(url=webhook_url)
+    return "!", 200
+
 
 # проверка ответа
 def check_word(message, user_data):
@@ -102,9 +131,11 @@ def check_word(message, user_data):
     gold = user_data['gold']
     index = user_data['index']
 
+    utils.add_definition(user_data['definition'], word)
+
     if gold == word:
         msg = bot.send_message(
-            message.chat.id, 
+            message.chat.id,
             'Поздравляем, ты угадал слово! Чтобы начать игру нажми /start'
         )
         utils.finish_user_game(message.chat.id)

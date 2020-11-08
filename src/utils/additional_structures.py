@@ -13,7 +13,7 @@ class FastText(Word2vec):
         self.model = compress_fasttext.models.CompressedFastTextKeyedVectors.load(path)
     
     def get_word_vector(self, word):
-        return self.model[word]      
+        return self.model[word]
 
 
 class Text2Lemms:
@@ -44,9 +44,9 @@ class WordTrie:
         for word, vector in wt.search_by_prefix('cats'): 
             print(word)
     '''
-    def __init__(self, word2vec:Word2vec):
+    def __init__(self, model):
         self.root = _Node('*')
-        self.get_vector = word2vec.get_word_vector
+        self.model = model
 
     def add(self, word):
         tmp_node = self.root
@@ -59,7 +59,7 @@ class WordTrie:
                 child.parent = tmp_node
             tmp_node = child
 
-        tmp_node.value = self.get_vector(word)
+        tmp_node.value = self.model[word]
 
     def build_dict(self, words):
         for word in words:

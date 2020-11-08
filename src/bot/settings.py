@@ -8,6 +8,7 @@ from config import Config
 # from src.models.hyp_model import HypWords
 # from src.models.sim_model import SimWords
 from src.models.sum_model import SumWords
+from src.utils.additional_structures import WordTrie
 
 LIST_MODELS = []
 
@@ -45,7 +46,11 @@ def init_models():
 
     fasttext_mod = compress_fasttext.models.CompressedFastTextKeyedVectors.load(fasttext_mod_path)
 
-    sum_words = SumWords(fasttext_mod, 20)
+    word_trie = WordTrie(fasttext_mod)
+    global LIST_PUZZLE_NOUNS
+    word_trie.build_dict(LIST_PUZZLE_NOUNS)
+
+    sum_words = SumWords(fasttext_mod, word_trie, 20)
 
     print('Ready')
 

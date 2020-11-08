@@ -1,8 +1,8 @@
 import re
 
-from nltk.tokenize import sent_tokenize
-from nltk.tokenize import word_tokenize
+import numpy as np
 from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 
 
 class SumWords:
@@ -10,12 +10,14 @@ class SumWords:
     Searching similar words for sentence words sum
     '''
 
-    def __init__(self, a_model, a_tops=10):
+    def __init__(self, a_model, a_trie, a_tops=10):
+        self.model = a_model
+        self.prefix_trie = a_trie
         self.tops = a_tops
         self.r = re.compile("[а-яА-Я-]+")
         self.stops = stopwords.words("russian")
-        self.model = a_model
         self.vocab = self.model.wv.vocab
+
 
     def is_in_vocab(self, word):
         return word in self.vocab
@@ -26,16 +28,24 @@ class SumWords:
         List is ranged by similarity level.
         '''
 
+        words_with_prefix = list(w[0] for w in self.prefix_trie.search_by_prefix(prefix))
+
         # prepare the list of words from the sentence
         words = [word.lower() for word in word_tokenize(sentence) if word.isalpha()]
         words = [w for w in filter(self.r.match, words)]
         words = [word for word in words if word not in self.stops]
 
-        words = [word for word in words if word in self.vocab]
-        if words != []:
-            sum_similar = self.model.wv.most_similar(positive=words, topn=self.tops)
-            res = [i[0] for i in sum_similar if prefix == i[0][:len(prefix)]]
+        # we are using fasttext - so we don't check if a word is in the dictionary
+        if words:
+            sum_vector = sum([self.model[word] for word in words])
+
+            def similarity(word):
+                return np.dot(sum_vector, self.model[word])
+
+            words_with_prefix.sort(key=lambda x: similarity(x), reverse=True)
+
+            res = words_with_prefix[:self.tops]
         else:
             return []
-        
+
         return res

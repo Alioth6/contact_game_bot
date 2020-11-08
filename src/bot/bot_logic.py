@@ -20,7 +20,9 @@ def start_message(message):
     word = config.get_random_word()
     msg = bot.send_message(
         message.chat.id,
-        'Я загадал слово на букву %s.' % word[0],
+        '''Я загадал слово на букву {0}.
+Объясни мне какое-нибудь слово на {0} так, чтобы я догадался, что это, и я открою следующую букву!'''.format(
+            word[0].upper()),
         reply_markup=empty_keyboard_hider
     )
     db_utils.set_user_data(message.chat.id,
@@ -29,6 +31,26 @@ def start_message(message):
                                'index': 1,
                                'state': int(config.States.S_ENTER_DEFINITION)
                            })
+
+
+@bot.message_handler(commands=['info'])
+def info_message(message):
+    msg = bot.send_message(
+        message.chat.id,
+        '''*Привет!*
+Я бот, с которым можно играть в *контакт* :)
+Механизм игры такой:
+
+- я загадываю слово и сообщаю тебе его первую букву;
+
+- твоя задача - объяснить мне какое-нибудь слово, начинающееся так же, так, чтобы я догадался, что это такое;
+
+- если я угадаю, то открою тебе следующую букву.
+
+Все загадываемые слова - существительные в неопределённой форме, имён собственных среди них нет.''',
+        reply_markup=empty_keyboard_hider,
+        parse_mode='Markdown'
+    )
 
 
 # модель угадала слово
@@ -47,7 +69,7 @@ def enter_yes(message):
                          and message.text == 'Нет',
     content_types=['text'])
 def enter_no(message):
-    send = bot.send_message(message.chat.id, "Я не смог угадать слово. Введи загаданное слово.")
+    send = bot.send_message(message.chat.id, "А какое слово ты загадал?")
     db_utils.set_user_state(message.chat.id, state=config.States.S_ENTER_WORD.value)
 
 
@@ -57,7 +79,7 @@ def enter_no(message):
     content_types=['text'])
 def enter_word(message):
     user_data = db_utils.get_user_data(message.chat.id)
-    user_data['word'] = message.text
+    user_data['word'] = message.text.lower().split()[0]
     check_word(message, user_data, guessed=False)
 
 
@@ -78,12 +100,12 @@ def enter_definition(message):
     if word:
         markup = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
         markup.add('Да', 'Нет')  # Имена кнопок
-        msg = bot.send_message(message.chat.id, 'Это слово "%s"?' % word, reply_markup=markup)
+        msg = bot.send_message(message.chat.id, 'Это слово "%s"?' % word.upper(), reply_markup=markup)
         user_data['state'] = config.States.S_CHECK_WORD.value
     else:
         msg = bot.send_message(
             message.chat.id,
-            "Я не знаю этого слова. Введи загаданное слово."
+            "Я не знаю, что это такое. Какое слово ты загадал?"
         )
         user_data['state'] = config.States.S_ENTER_WORD.value
 
@@ -95,8 +117,8 @@ def enter_definition(message):
 def default(message):
     bot.send_message(
         message.chat.id,
-        """Чтобы начать игру, нажмите /start ,
-чтобы получить информацию об игре, нажмите /info"""
+        """Чтобы начать игру, нажми /start ,
+чтобы получить информацию об игре, нажми /info"""
     )
 
 
@@ -108,18 +130,27 @@ def check_word(message, user_data, guessed):
 
     db_utils.add_definition(word, user_data['definition'], guessed)
 
+    # игрок угадал загаданное слово
     if gold == word:
         msg = bot.send_message(
             message.chat.id,
-            'Поздравляем, ты угадал слово! Чтобы начать игру нажми /start'
+            'Поздравляю, ты угадал! Чтобы начать игру нажми /start'
         )
         db_utils.finish_user_game(message.chat.id)
+    # слово игрока начинается на верный префикс
     elif gold[:index] == word[:index]:
-        send = bot.send_message(message.chat.id, "Следующая буква: %s" % gold[index])
-        user_data['index'] = index + 1
+        if guessed:
+            send = bot.send_message(message.chat.id,
+                                    '''Следующая буква - {0}.
+Объясни мне что-нибудь на {1}'''.format(gold[index].upper(),
+                                        gold[:index + 1].upper()))
+            user_data['index'] = index + 1
+        else:
+            send = bot.send_message(message.chat.id, "Попробуй объяснить другое слово на %s" % gold[:index].upper())
         user_data['state'] = config.States.S_ENTER_DEFINITION.value
         db_utils.set_user_data(message.chat.id, data=user_data)
+    # слово начинается на неверный префикс
     else:
-        msg = bot.send_message(message.chat.id, '''Слово должно начинаться на %s.
-Попробуйте ввести определение слова сначала''' % gold[:index])
+        msg = bot.send_message(message.chat.id, '''Но слово должно начинаться на %s!
+Попробуй объяснить мне другое слово.''' % gold[:index].upper())
         db_utils.set_user_state(message.chat.id, state=config.States.S_ENTER_DEFINITION.value)

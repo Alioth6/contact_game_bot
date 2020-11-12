@@ -134,17 +134,24 @@ def check_word(message, user_data, guessed):
     if gold == word:
         msg = bot.send_message(
             message.chat.id,
-            'Поздравляю, ты угадал! Чтобы начать игру нажми /start'
+            '''Точно, это %s!
+Чтобы начать игру нажми /start''' % gold.upper()
         )
         db_utils.finish_user_game(message.chat.id)
     # слово игрока начинается на верный префикс
     elif gold[:index] == word[:index]:
         if guessed:
-            send = bot.send_message(message.chat.id,
-                                    '''Следующая буква - {0}.
+            if len(gold) == index + 1:
+                send = bot.send_message(message.chat.id,
+                                        '''Ты открыл все буквы, это было слово {0}.
+Чтобы начать игру нажми /start'''.format(gold.upper()))
+                db_utils.finish_user_game(message.chat.id)
+            else:
+                send = bot.send_message(message.chat.id,
+                                        '''Следующая буква - {0}.
 Объясни мне что-нибудь на {1}'''.format(gold[index].upper(),
                                         gold[:index + 1].upper()))
-            user_data['index'] = index + 1
+                user_data['index'] = index + 1
         else:
             send = bot.send_message(message.chat.id, "Попробуй объяснить другое слово на %s" % gold[:index].upper())
         user_data['state'] = config.States.S_ENTER_DEFINITION.value

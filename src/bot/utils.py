@@ -24,6 +24,7 @@ def set_user_data(chat_id, data):
             db.session.add(new_user)
             db.session.commit()
     except Exception as e:
+        db.session.rollback()
         print(str(e))
 
 
@@ -48,6 +49,7 @@ def set_user_state(chat_id, state):
         user_state.state = int(state)
         db.session.commit()
     except AttributeError as e:
+        db.session.rollback()
         print(str(e))
 
 
@@ -80,6 +82,7 @@ def add_definition(word, definition, guessed):
         db.session.commit()
         print("Def added. Def id={}".format(new_def.id))
     except Exception as e:
+        db.session.rollback()
         print(str(e))
 
 

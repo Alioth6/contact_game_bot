@@ -9,7 +9,7 @@ from config import Config
 # from src.models.sim_model import SimWords
 from src.models.sum_model import SumWords
 from src.utils.additional_structures import WordTrie
-from src.utils.spell_checker import Spell_checker
+# from src.utils.spell_checker import Spell_checker
 from src.utils.text_to_lemms import Text2Lemms
 
 LIST_MODELS = []
@@ -68,16 +68,17 @@ def init_converter():
     ])
 
     # reading dictionary file to list
-    with smart_open.open(dict_file_name) as f:
-        words_list = [string.strip() for string in f]
+    # with smart_open.open(dict_file_name) as f:
+    #     words_list = [string.strip() for string in f]
 
     # build all dictionary based word trie
-    words_trie = WordTrie(fasttext_mod)
-    words_trie.build_dict(words_list)
+    # words_trie = WordTrie(fasttext_mod)
+    # words_trie.build_dict(words_list)
 
-    spell_checker = Spell_checker(words_trie)
+    # spell_checker = Spell_checker(words_trie)
     global NORMALIZER
-    NORMALIZER = Text2Lemms(spell_checker)
+    # NORMALIZER = Text2Lemms(spell_checker)
+    NORMALIZER = Text2Lemms()
 
     print('Ready')
 

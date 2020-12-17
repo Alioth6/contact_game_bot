@@ -5,7 +5,7 @@ import compress_fasttext
 import smart_open
 
 from config import Config
-# from src.models.hyp_model import HypWords
+from src.models.hyp_model import HypWords
 # from src.models.sim_model import SimWords
 from src.models.sum_model import SumWords
 from src.utils.additional_structures import WordTrie
@@ -53,10 +53,12 @@ def init_converter():
     global LIST_PUZZLE_NOUNS
     NOUNS_TRIE.build_dict(LIST_PUZZLE_NOUNS)
 
+    hyp_words = HypWords(1)
     sum_words = SumWords(fasttext_mod, 1)
 
     global LIST_MODELS
     LIST_MODELS = [
+        hyp_words,
         sum_words
     ]
 
@@ -102,8 +104,14 @@ def convert_question_to_word(question, prefix=None):
     # classifier returns the list of indices of models to process
     indices = list(range(len(LIST_MODELS)))
 
+    pos_string = NORMALIZER.get_pos_string()
+    if pos_string.count('s') > 1 or pos_string.count('g') > 0:
+        indices = [1]
+
     list_words = []
     for i in indices:
         list_words += LIST_MODELS[i].get_words(query)
+        if list_words:
+            break
 
     return list_words[0] if list_words else None

@@ -1,9 +1,6 @@
 from collections import defaultdict
 
-import re
-
-from nltk.tokenize import sent_tokenize
-from nltk.tokenize import word_tokenize
+import numpy as np
 from nltk.corpus import stopwords
 
 
@@ -12,37 +9,38 @@ class SimWords:
     Searching similar words for every word from sentence
     '''
 
-    def __init__(self, a_model, a_tops=10):
+    def __init__(self, a_model, a_tops=10, a_n_similar=3):
         self.tops = a_tops
-        self.r = re.compile("[а-яА-Я-]+")
+        self.n_similar = a_n_similar
         self.stops = stopwords.words("russian")
         self.model = a_model
-        self.vocab = self.model.wv.vocab
 
-    def is_in_vocab(self, word):
-        return word in self.vocab
-
-    def get_words(self, sentence, prefix):
+    def get_words(self, query):
         '''
         Returns a list of similar words with fixed prefix.
         List is ranged by the number of search appearance.
         '''
 
+        words_with_prefix = query['words_with_prefix']
+
         # prepare the list of words from the sentence
-        words = [word.lower() for word in word_tokenize(sentence) if word.isalpha()]
-        words = [w for w in filter(self.r.match, words)]
-        words = [word for word in words if word not in self.stops]
+        words = [entry['lex'] for entry in query['lem_pos_list'] if entry['lex'] not in self.stops]
 
         # dictionary for search appears counting
         found = defaultdict(int)
         for word in words:
-            if word in self.vocab:
-                similar = [i[0] for i in self.model.wv.most_similar(word, topn=self.tops)]
-                for elem in similar:
-                    if prefix == elem[:len(prefix)]:
-                        found[elem] += 1
+            vector = self.model[word]
+
+            def similarity(word):
+                return np.dot(vector, self.model[word])
+
+            words_with_prefix.sort(key=lambda x: similarity(x), reverse=True)
+            res = words_with_prefix[:self.n_similar]
+            for elem in res:
+                found[elem] += 1
+
                         
         ranged_list = sorted(found.items(), key=lambda item: item[1], reverse=True)
-        res = [elem[0] for elem in ranged_list]
+        res = [elem[0] for elem in ranged_list[:self.tops]]
         
         return res

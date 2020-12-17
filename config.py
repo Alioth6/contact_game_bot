@@ -9,6 +9,7 @@ class Config:
 
     MODEL_FILE_NAME = 'ft_freqprune_100K_20K_pq_300.bin'
     NOUNS_FILE_NAME = 'freq_nouns.txt'
+    DICT_FILE_NAME = 'freq_all_words.txt'
 
     SQLALCHEMY_DATABASE_URI = env['DATABASE_URL']
 

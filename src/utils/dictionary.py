@@ -3,12 +3,13 @@ import os
 import pandas as pd
 from collections import Counter
 from nltk.corpus import stopwords
-from .additional_structures import Text2Lemms, WordTrie, FastText
+from .additional_structures import WordTrie, FastText
+from src.utils.text_to_lemms import Text2Lemms
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH = os.path.join(PROJECT_DIR, '../data')
 
-PATH_TO_WIGHT_FASTTEXT = os.path.join(DATA_PATH, 'ft_freqprune_400K_100K_pq_300.bin')
+PATH_TO_WIGHT_FASTTEXT = os.path.join(DATA_PATH, 'ft_freqprune_100K_20K_pq_300.bin')
 PATH_TO_WIKI = os.path.join(DATA_PATH, 'wiktionary_data0.csv')
 DICTIONARY_SIZE = 10000
 

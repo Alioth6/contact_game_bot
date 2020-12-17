@@ -1,14 +1,13 @@
 from wiki_ru_wordnet import WikiWordnet
 
 from src.utils.features_sentence import search_simple_bigramm
-from src.utils.dictionary import text2LemmsModel, get_prefix_trie
 
 
 class HypWords:
     # hyponym and hypernym words
-    def __init__(self, prefix_trie=None):
+    def __init__(self, a_tops=10):
         self.wikiwordnet = WikiWordnet()
-        self.prefix_trie = get_prefix_trie() # перенести потом в бота, инициализировать перед запуском, как и остальные модели
+        self.tops = a_tops
 
     def _get_hyp_with_prefix(self, word, words_with_prefix):
         hyp_w = get_hyponym_and_hypernym(self.wikiwordnet, word)
@@ -21,25 +20,25 @@ class HypWords:
         sets = self.wikiwordnet.get_synsets(word)
         return len(sets) != 0
 
-    def get_words(self, sentence, prefix):
-        list_lex = text2LemmsModel.get_lemms(sentence)
-        bigramm_w = search_simple_bigramm(list_lex)
-        words_with_prefix = set(w[0] for w in self.prefix_trie.search_by_prefix(prefix))
+    def get_words(self, query):
+        lem_pos_list = query['lem_pos_list']
+        bigramm_w = search_simple_bigramm(lem_pos_list)
+        words_with_prefix = set(query['words_with_prefix'])
         word = None
 
         if bigramm_w:
             bigramm = ' '.join(bigramm_w)
             ans = self._get_hyp_with_prefix(bigramm, words_with_prefix)
             if ans:
-                return ans
+                return ans[:self.tops]
             word = bigramm_w[1]
         else:
-            for w in list_lex:
+            for w in lem_pos_list:
                 if w['pos'] == 'S':
                     word = w['lex']
                     break
 
-        return self._get_hyp_with_prefix(word, words_with_prefix)
+        return self._get_hyp_with_prefix(word, words_with_prefix)[:self.tops]
 
 
 def get_hyponym_and_hypernym(wikiwordnet, word):

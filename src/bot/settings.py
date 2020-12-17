@@ -9,8 +9,12 @@ from config import Config
 # from src.models.sim_model import SimWords
 from src.models.sum_model import SumWords
 from src.utils.additional_structures import WordTrie
+from src.utils.spell_checker import Spell_checker
+from src.utils.text_to_lemms import Text2Lemms
 
 LIST_MODELS = []
+NORMALIZER = None
+NOUNS_TRIE = None
 
 
 class States(IntEnum):
@@ -25,8 +29,6 @@ def init_puzzle_nouns():
         Config.NOUNS_FILE_NAME
     ])
 
-    puzzle_nouns = []
-
     with smart_open.open(nouns_list_name) as f:
         puzzle_nouns = [string.strip() for string in f]
 
@@ -36,7 +38,7 @@ def init_puzzle_nouns():
 LIST_PUZZLE_NOUNS = init_puzzle_nouns()
 
 
-def init_models():
+def init_converter():
     print('Models initialization...')
 
     fasttext_mod_path = ''.join([
@@ -46,18 +48,38 @@ def init_models():
 
     fasttext_mod = compress_fasttext.models.CompressedFastTextKeyedVectors.load(fasttext_mod_path)
 
-    word_trie = WordTrie(fasttext_mod)
+    global NOUNS_TRIE
+    NOUNS_TRIE = WordTrie(fasttext_mod)
     global LIST_PUZZLE_NOUNS
-    word_trie.build_dict(LIST_PUZZLE_NOUNS)
+    NOUNS_TRIE.build_dict(LIST_PUZZLE_NOUNS)
 
-    sum_words = SumWords(fasttext_mod, word_trie, 20)
-
-    print('Ready')
+    sum_words = SumWords(fasttext_mod, 1)
 
     global LIST_MODELS
     LIST_MODELS = [
         sum_words
     ]
+
+    print('Normalizer initialization...')
+
+    dict_file_name = ''.join([
+        Config.DATA_PATH,
+        Config.DICT_FILE_NAME
+    ])
+
+    # reading dictionary file to list
+    with smart_open.open(dict_file_name) as f:
+        words_list = [string.strip() for string in f]
+
+    # build all dictionary based word trie
+    words_trie = WordTrie(fasttext_mod)
+    words_trie.build_dict(words_list)
+
+    spell_checker = Spell_checker(words_trie)
+    global NORMALIZER
+    NORMALIZER = Text2Lemms(spell_checker)
+
+    print('Ready')
 
 
 def get_random_word():
@@ -65,8 +87,22 @@ def get_random_word():
 
 
 def convert_question_to_word(question, prefix=None):
+    # the list of lemmatized and checked words with PoS tags
+    lem_pos_list = NORMALIZER.get_lemms(question)
+    words_with_prefix = list(w[0] for w in NOUNS_TRIE.search_by_prefix(prefix))
+
+    query = {
+        'sentence': question,
+        'prefix': prefix,
+        'lem_pos_list': lem_pos_list,
+        'words_with_prefix': words_with_prefix
+    }
+
+    # classifier returns the list of indices of models to process
+    indices = list(range(len(LIST_MODELS)))
+
     list_words = []
-    for model in LIST_MODELS:
-        list_words += model.get_words(question, prefix)
+    for i in indices:
+        list_words += LIST_MODELS[i].get_words(query)
 
     return list_words[0] if list_words else None

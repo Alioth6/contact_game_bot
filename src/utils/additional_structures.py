@@ -1,6 +1,4 @@
 import compress_fasttext
-from pymystem3 import Mystem
-import re
 
 
 class Word2vec:
@@ -14,25 +12,6 @@ class FastText(Word2vec):
     
     def get_word_vector(self, word):
         return self.model[word]
-
-
-class Text2Lemms:
-    def __init__(self):
-        self.mystem = Mystem()
-    
-    def get_lemms(self, text, tag=None):
-        list_lemm = []
-        for lemma in self.mystem.analyze(text):
-            if 'analysis' in lemma and len(lemma['analysis']):
-                analysis = lemma['analysis'][0]
-                if analysis.get('qual', None) == 'bastard':
-                    continue
-                pos_tag = re.match('[A-Z]+', analysis['gr']).group(0)
-                if tag and pos_tag==tag:
-                    list_lemm.append(analysis['lex'])
-                elif not tag:
-                    list_lemm.append({'lex': analysis['lex'], 'pos': pos_tag})
-        return list_lemm
 
 
 class WordTrie:

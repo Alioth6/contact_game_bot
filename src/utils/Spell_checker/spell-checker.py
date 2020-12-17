@@ -2,18 +2,22 @@ from src.utils.dictionary import get_prefix_trie
 from .additional_structures import _Node, WordTrie
 
 
-class Spell_checker:
+class SpellChecker:
     def __init__(self, trie=get_prefix_trie(True)):
         self.trie = trie
-        self.min_dist = 100
-        self.closest_str = ""
+        self.init_values_before_new_word()
 
-    def update_values_before_new_word(self):
-        self.min_dist = 100
-        self.closest_str = ""
+    def __init_values_before_new_word(self):
+        self.__min_dist = 100
+        self.__closest_str = ""
 
-    def dfs(self, tmp_node, word, flag):
-        # flag indicates whether to use an improved version of the Levenshtein's algorithm
+    def __dfs(self, tmp_node: _Node, word: str, flag: bool) -> None:
+        """
+        :param tmp_node: current search vertex
+        :param word: the word to which we are looking for the closest from the dictionary
+        :param flag: if True then an improved version of the Levenshtein's algorithm will be used,
+        otherwise, an usual version will be used
+        """
         if tmp_node.value is not None:
             vocab_word = tmp_node._get_prefix()
             number_of_cols = len(vocab_word) + 1
@@ -25,9 +29,7 @@ class Spell_checker:
                 d_levenshtein[0][j] = j
             for i in range(1, len(word) + 1):
                 for j in range(1, number_of_cols):
-                    delta = 1
-                    if word[i - 1] == vocab_word[j - 1]:
-                        delta = 0
+                    delta = int(word[i - 1] != vocab_word[j - 1])
                     curr_row = i if not flag else 1
                     d_levenshtein[curr_row][j] = min(d_levenshtein[curr_row][j - 1] + 1, d_levenshtein[curr_row - 1][j] + 1,
                                                      d_levenshtein[curr_row - 1][j - 1] + delta)
@@ -42,9 +44,14 @@ class Spell_checker:
             for child in tmp_node.children.values():
                 dfs(self, child, word, flag)
 
-    def search_closest_word(self, word, flag):
-        # flag indicates whether to use an improved version of the Levenshtein's algorithm
-        self.update_values_before_new_word()
+    def search_closest_word(self, word: str, flag: bool) -> str:
+        """
+        :param word: the word to which we are looking for the closest from the dictionary
+        :param flag: bool; if flag == True then an improved version of the Levenshtein's algorithm will be used,
+        otherwise, an usual version will be used
+        :returns: the word from the dictionary closest to the input param 'word' (Levenshtein's metric)
+        """
+        self.init_values_before_new_word()
         found_words = [vocab_word for vocab_word, vector in self.trie.search_by_prefix(word)]
         if word in found_words:
             return word

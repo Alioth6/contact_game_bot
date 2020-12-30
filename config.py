@@ -10,6 +10,8 @@ class Config:
     MODEL_FILE_NAME = 'ft_freqprune_100K_20K_pq_300.bin'
     NOUNS_FILE_NAME = 'freq_nouns.txt'
 
+    SQLALCHEMY_DATABASE_URI = env['DATABASE_URL']
+
     if env['APP_CONFIG'] == 'local':
         WEBHOOK_HOST = env['WEBHOOK_HOST']
 

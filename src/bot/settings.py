@@ -1,20 +1,18 @@
+import random
+from enum import IntEnum
+
 import compress_fasttext
 import smart_open
-from enum import Enum
+
 from config import Config
-import os
 # from src.models.hyp_model import HypWords
 # from src.models.sim_model import SimWords
 from src.models.sum_model import SumWords
 
-
-USER_STATE = 'data/user_state'  # Файл с хранилищем
-DATABASE_NAME = 'data/database.csv'  # Файл с базой данных
-
 LIST_MODELS = []
 
 
-class States(Enum):
+class States(IntEnum):
     S_ENTER_DEFINITION = 0
     S_ENTER_WORD = 1
     S_CHECK_WORD = 2
@@ -55,3 +53,15 @@ def init_models():
     LIST_MODELS = [
         sum_words
     ]
+
+
+def get_random_word():
+    return random.choice(LIST_PUZZLE_NOUNS)
+
+
+def convert_question_to_word(question, prefix=None):
+    list_words = []
+    for model in LIST_MODELS:
+        list_words += model.get_words(question, prefix)
+
+    return list_words[0] if list_words else None

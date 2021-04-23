@@ -14,22 +14,24 @@ telebot.logger.setLevel(logging.INFO)
 
 from src.bot import utils as db_utils
 
+exceptions = []
+
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
-    word = config.get_random_word()
-    msg = bot.send_message(
+    word = config.get_random_word().upper()
+    bot.send_message(
         message.chat.id,
         'Я загадал слово на букву %s.' % word[0],
         reply_markup=empty_keyboard_hider
     )
     db_utils.set_user_data(message.chat.id,
                            data={
-                               'gold': word,
+                               'gold': word.lower(),
                                'index': 1,
-                               'state': int(config.States.S_ENTER_DEFINITION),
-                               'exceptions': []
+                               'state': int(config.States.S_ENTER_DEFINITION)
                            })
+    exceptions.clear()
 
 
 # модель угадала слово
@@ -48,7 +50,7 @@ def enter_yes(message):
                          and message.text == 'Нет',
     content_types=['text'])
 def enter_no(message):
-    send = bot.send_message(message.chat.id, "Я не смог угадать слово. Введи загаданное слово.")
+    bot.send_message(message.chat.id, "Я не смог угадать слово. Введи загаданное слово.")
     db_utils.set_user_state(message.chat.id, state=config.States.S_ENTER_WORD.value)
 
 
@@ -79,10 +81,10 @@ def enter_definition(message):
     if word:
         markup = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
         markup.add('Да', 'Нет')  # Имена кнопок
-        msg = bot.send_message(message.chat.id, 'Это слово "%s"?' % word, reply_markup=markup)
+        bot.send_message(message.chat.id, 'Это слово "%s"?' % word, reply_markup=markup)
         user_data['state'] = config.States.S_CHECK_WORD.value
     else:
-        msg = bot.send_message(
+        bot.send_message(
             message.chat.id,
             "Я не знаю этого слова. Введи загаданное слово."
         )
@@ -96,8 +98,7 @@ def enter_definition(message):
 def default(message):
     bot.send_message(
         message.chat.id,
-        """Чтобы начать игру, нажмите /start ,
-чтобы получить информацию об игре, нажмите /info"""
+        """Чтобы начать игру, нажмите /start, чтобы получить информацию об игре, нажмите /info"""
     )
 
 
@@ -106,29 +107,37 @@ def check_word(message, user_data, guessed):
     word = user_data['word']
     gold = user_data['gold']
     index = user_data['index']
-    
-    if word not in user_data['exceptions']:
+
+    if word not in exceptions:
         db_utils.add_definition(word, user_data['definition'], guessed)
 
-    if gold == word:
-        msg = bot.send_message(
+    if gold.lower() == word.lower():
+        bot.send_message(
             message.chat.id,
             'Поздравляем, ты угадал слово! Чтобы начать игру нажми /start'
         )
         db_utils.finish_user_game(message.chat.id)
-    elif gold[:index] == word[:index]:
-        if word in user_data['exceptions']:
-            send = bot.send_message(message.chat.id,
-                                    "Ты уже называл это слово! Введи что-нибудь новенькое, пожалуйста:)")
-        else:
-            send = bot.send_message(message.chat.id, "Следующая буква: %s" % gold[index])
+    elif gold.lower()[:index] == word.lower()[:index]:
+        if word in exceptions:
+            bot.send_message(message.chat.id,
+                             "Ты уже называл это слово! Введи что-нибудь новенькое, пожалуйста:)")
+            user_data['state'] = config.States.S_ENTER_DEFINITION.value
+            db_utils.set_user_data(message.chat.id, data=user_data)
+        elif index < len(gold):
+            bot.send_message(message.chat.id, "Следующая буква: %s" % gold.upper()[index])
             user_data['index'] = index + 1
-            user_data['exceptions'].append(word)
-        user_data['state'] = config.States.S_ENTER_DEFINITION.value
-        db_utils.set_user_data(message.chat.id, data=user_data)
+            exceptions.append(word)
+            user_data['state'] = config.States.S_ENTER_DEFINITION.value
+            db_utils.set_user_data(message.chat.id, data=user_data)
+        else:
+            bot.send_message(message.chat.id,
+                             "Это победа, поздравляем! Ты дошёл до конца загаданного слова:) Чтобы начать игру нажми "
+                             "/start")
+            db_utils.finish_user_game(message.chat.id)
     else:
-        if word not in used_data['exceptions']:
-            user_data['exceptions'].append(word)
-        msg = bot.send_message(message.chat.id, '''Слово должно начинаться на %s.
-Попробуйте ввести определение слова сначала''' % gold[:index])
+        if word not in exceptions:
+            exceptions.append(word)
+            bot.send_message(message.chat.id,
+                             '''Слово должно начинаться на %s. Попробуйте ввести определение слова сначала'''
+                             % gold.upper()[:index])
         db_utils.set_user_state(message.chat.id, state=config.States.S_ENTER_DEFINITION.value)

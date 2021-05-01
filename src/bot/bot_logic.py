@@ -14,6 +14,7 @@ telebot.logger.setLevel(logging.INFO)
 
 from src.bot import utils as db_utils
 
+
 exceptions = []
 
 
